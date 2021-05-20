@@ -262,6 +262,9 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   };
 
   let el = document.createElement("div");
+  let loading = document.createElement("div");
+  loading.innerHTML = "Chargement de la carte..."
+  loading.style = "text-align:center"
   el.style.width = "100%";
   el.style.height = "500px";
   let tiles = L.tileLayer(
@@ -272,8 +275,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   let map = L.map(el, {
     //center: latlng,
     zoom: 13,
-    layers: [tiles],
-    loading: true
+    layers: [tiles]
   });
   const container = window.DATASETTE_CLUSTER_MAP_CONTAINER;
   if (container && document.querySelector(container)) {
@@ -287,6 +289,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   let progressDiv = document.createElement("div");
   progressDiv.style.marginBottom = "2em";
   el.parentNode.insertBefore(progressDiv, el.nextSibling);
+  loading.parentNode.insertBefore(el, loading.nextSibling);
   let markerClusterGroup = L.markerClusterGroup({
     chunkedLoading: true,
     maxClusterRadius: 50,
@@ -299,4 +302,5 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
     path += "?_size=max&_labels=on&_shape=objects";
   }
   loadMarkers(path, map, markerClusterGroup, progressDiv, 0);
+  loading.remove(); 
 };
