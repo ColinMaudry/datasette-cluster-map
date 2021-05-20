@@ -242,7 +242,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
               );
             });
           }
-          progressDiv.innerHTML = `Showing ${count.toLocaleString()} of ${data.filtered_table_rows_count.toLocaleString()}${percent} `;
+          progressDiv.innerHTML = `Affichage des ${count.toLocaleString()} premiers objets sur un total de ${data.filtered_table_rows_count.toLocaleString()}${percent} `;
           if (button) {
             progressDiv.appendChild(button);
           }
@@ -285,6 +285,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   }
   let progressDiv = document.createElement("div");
   progressDiv.style.marginBottom = "2em";
+  progressDiv.innerHTML = '<img src="https://media.giphy.com/media/swhRkVYLJDrCE/giphy.gif"/>'
   el.parentNode.insertBefore(progressDiv, el.nextSibling);
   let markerClusterGroup = L.markerClusterGroup({
     chunkedLoading: true,
