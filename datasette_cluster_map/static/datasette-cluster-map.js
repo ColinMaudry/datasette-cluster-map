@@ -302,5 +302,5 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
     path += "?_size=max&_labels=on&_shape=objects";
   }
   loadMarkers(path, map, markerClusterGroup, progressDiv, 0);
-  loading.remove();
+  //loading.remove();
 };
