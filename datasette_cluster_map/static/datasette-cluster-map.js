@@ -273,6 +273,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
     //center: latlng,
     zoom: 13,
     layers: [tiles],
+    loading: true
   });
   const container = window.DATASETTE_CLUSTER_MAP_CONTAINER;
   if (container && document.querySelector(container)) {
@@ -285,7 +286,6 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   }
   let progressDiv = document.createElement("div");
   progressDiv.style.marginBottom = "2em";
-  progressDiv.innerHTML = '<img src="https://media.giphy.com/media/swhRkVYLJDrCE/giphy.gif"/>'
   el.parentNode.insertBefore(progressDiv, el.nextSibling);
   let markerClusterGroup = L.markerClusterGroup({
     chunkedLoading: true,
