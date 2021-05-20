@@ -279,6 +279,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   });
   const container = window.DATASETTE_CLUSTER_MAP_CONTAINER;
   if (container && document.querySelector(container)) {
+    document.querySelector(container).appendChild(loading);
     document.querySelector(container).appendChild(el);
   } else {
     let table =
@@ -289,7 +290,6 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   let progressDiv = document.createElement("div");
   progressDiv.style.marginBottom = "2em";
   el.parentNode.insertBefore(progressDiv, el.nextSibling);
-  loading.parentNode.insertBefore(el, loading.nextSibling);
   let markerClusterGroup = L.markerClusterGroup({
     chunkedLoading: true,
     maxClusterRadius: 50,
@@ -302,5 +302,5 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
     path += "?_size=max&_labels=on&_shape=objects";
   }
   loadMarkers(path, map, markerClusterGroup, progressDiv, 0);
-  loading.remove(); 
+  loading.remove();
 };
