@@ -221,7 +221,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
             100
           }%)`;
           // Add a control to either continue loading or pause
-          button = document.createElement("button");
+       /*   button = document.createElement("button");
           button.classList.add("cluster-map-button");
           if (keepGoing) {
             button.innerHTML = "pause";
@@ -239,9 +239,9 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
                 progressDiv,
                 count,
                 keepGoing
-              );
-            });
-          }
+              );*/
+            /*});*/
+          /*}*/
           progressDiv.innerHTML = `Affichage des ${count.toLocaleString()} premiers objets sur un total de ${data.filtered_table_rows_count.toLocaleString()}${percent} `;
           if (button) {
             progressDiv.appendChild(button);
