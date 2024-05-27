@@ -1,4 +1,4 @@
-from datasette_cluster_map import extra_js_urls
+from datasette_cluster_map import location_columns_from_columns
 from datasette.app import Datasette
 import pytest
 import sqlite_utils
@@ -89,6 +89,15 @@ def db_path(tmp_path_factory):
                 'window.DATASETTE_CLUSTER_MAP_CONTAINER = "#map-goes-here";',
             ],
         ),
+        # This one should detect the columns even though they aren't configured
+        (
+            {},
+            "places_lat_lng",
+            [
+                'window.DATASETTE_CLUSTER_MAP_LATITUDE_COLUMN = "lat";',
+                'window.DATASETTE_CLUSTER_MAP_LONGITUDE_COLUMN = "lng";',
+            ],
+        ),
     ],
 )
 async def test_plugin_config(db_path, config, table, expected_fragments):
@@ -107,7 +116,7 @@ async def test_plugin_config(db_path, config, table, expected_fragments):
         ("/test", False),
         ("/test?sql=select+1+-+1;", False),
         ("/test?sql=select+*+from+places;", True),
-        ("/-/config", False),
+        ("/-/settings", False),
         ("/test/dogs", False),
         ("/test/places", True),
         ("/test/places_caps", True),
@@ -145,8 +154,8 @@ async def test_plugin_is_installed():
 
 @pytest.mark.asyncio
 async def test_respects_base_url():
-    ds = Datasette([], memory=True, config={"base_url": "/foo/"})
-    response = await ds.client.get("/:memory:?sql=select+1+as+latitude,+2+as+longitude")
+    ds = Datasette([], memory=True, settings={"base_url": "/foo/"})
+    response = await ds.client.get("/_memory?sql=select+1+as+latitude,+2+as+longitude")
     assert (
         textwrap.dedent(
             """
@@ -157,3 +166,34 @@ async def test_respects_base_url():
         ).strip()
         in response.text
     )
+
+
+@pytest.mark.parametrize(
+    "input,expected",
+    (
+        ([], []),
+        (["a", "b"], []),
+        (["a", "b", "latitude", "longitude"], ["latitude", "longitude"]),
+        (["a", "b", "lat", "lon", "c"], ["lat", "lon"]),
+        (["a", "b", "lat", "lng", "c"], ["lat", "lng"]),
+        (["a", "b", "lat", "long", "c"], ["lat", "long"]),
+        # Wildcard matches
+        (["a", "foo_latitude", "foo_longitude"], ["foo_latitude", "foo_longitude"]),
+        (["a", "foo_latitude", "bar_longitude"], ["foo_latitude", "bar_longitude"]),
+        (["a", "foo_lat", "foo_long"], ["foo_lat", "foo_long"]),
+        (["a", "foo_lat", "foo_lon"], ["foo_lat", "foo_lon"]),
+        (["a", "foo_lat", "foo_lng"], ["foo_lat", "foo_lng"]),
+        # latitude, longitude takes priority over country_long
+        # https://github.com/simonw/datasette-cluster-map/issues/39#issuecomment-1890310833
+        (["country_long", "latitude", "longitude"], ["latitude", "longitude"]),
+        # latitude, longitude takes priority:
+        (["a", "lat", "lon", "c", "latitude", "longitude"], ["latitude", "longitude"]),
+        # Ambiguous wildcards:
+        (["a", "foo_lat", "foo_lng", "foo_latitude", "foo_longitude"], []),
+    ),
+)
+def test_location_columns_from_columns(input, expected):
+    actual = location_columns_from_columns(input)
+    actual_cap = location_columns_from_columns([col.upper() for col in input])
+    assert actual == expected
+    assert actual_cap == [col.upper() for col in expected]

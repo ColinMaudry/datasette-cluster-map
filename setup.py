@@ -1,7 +1,7 @@
 from setuptools import setup
 import os
 
-VERSION = "0.17.1"
+VERSION = "0.18.1"
 
 
 def get_long_description():
@@ -25,7 +25,12 @@ setup(
         "Changelog": "https://github.com/simonw/datasette-cluster-map/releases",
     },
     license="Apache License, Version 2.0",
+    classifiers=[
+        "Framework :: Datasette",
+        "License :: OSI Approved :: Apache Software License",
+    ],
     version=VERSION,
+    python_requires=">=3.8",
     packages=["datasette_cluster_map"],
     entry_points={"datasette": ["cluster_map = datasette_cluster_map"]},
     package_data={
@@ -35,6 +40,15 @@ setup(
         ]
     },
     install_requires=["datasette>=0.54", "datasette-leaflet>=0.2.2"],
-    extras_require={"test": ["pytest", "pytest-asyncio", "httpx", "sqlite-utils"]},
-    tests_require=["datasette-cluster-map[test]"],
+    extras_require={
+        "test": [
+            "pytest",
+            "pytest-asyncio",
+            "httpx",
+            "sqlite-utils",
+            "nest-asyncio",
+            "datasette-test",
+        ],
+        "playwright": ["pytest-playwright"],
+    },
 )
