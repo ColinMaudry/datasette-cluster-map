@@ -22,7 +22,14 @@ If you are deploying using the `datasette publish` command you can use the `--in
 
     datasette publish cloudrun mydb.db --install=datasette-cluster-map
 
-If any of your tables have a `latitude` and `longitude` column, a map will be automatically displayed.
+If any of your tables have one of the following pairs of columns a map will be automatically displayed:
+
+- `latitude` and `longitude`
+- `lat` and `lng`
+- `lat` and `lon`
+- `lat` and `long`
+- `*_latitude` and `*_longitude`
+- `*_lat` and `*_lng` for any of the three variants of `lng`
 
 ## Configuration
 
@@ -80,19 +87,16 @@ The map defaults to being displayed above the main results table on the page. Yo
 
 ## Custom tile layers
 
-You can customize the tile layer used  by the maps using the `tile_layer` and `tile_layer_options` configuration settings. For example, to use the [Stamen Watercolor tiles](http://maps.stamen.com/watercolor/#12/37.7706/-122.3782) you can use these settings:
+You can customize the tile layer used  by the maps using the `tile_layer` and `tile_layer_options` configuration settings. For example, to use the [OpenTopoMap](https://opentopomap.org/) you can use these settings:
 
 ```json
 {
     "plugins": {
         "datasette-cluster-map": {
-            "tile_layer": "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}",
+            "tile_layer": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
             "tile_layer_options": {
-                "attribution": "Map tiles by <a href=\"http://stamen.com\">Stamen Design</a>, <a href=\"http://creativecommons.org/licenses/by/3.0\">CC BY 3.0</a> &mdash; Map data &copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors",
-                "subdomains": "abcd",
-                "minZoom": 1,
-                "maxZoom": 16,
-                "ext": "jpg"
+                "attribution": "Map data: &copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors, <a href='http://viewfinderpanoramas.org'>SRTM</a> | Map style: &copy; <a href='https://opentopomap.org'>OpenTopoMap</a> (<a href='https://creativecommons.org/licenses/by-sa/3.0/'>CC-BY-SA</a>)",
+                "maxZoom": 17
             }
         }
     }

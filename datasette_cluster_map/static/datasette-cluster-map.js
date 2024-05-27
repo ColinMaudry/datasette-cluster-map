@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         col.toLowerCase() ==
         (
-          window.DATASETTE_CLUSTER_MAP_LATITUDE_COLUMN || "latitude"
+          window.DATASETTE_CLUSTER_MAP_LATITUDE_COLUMN
         ).toLowerCase()
       ) {
         latitudeColumn = col;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (
         col.toLowerCase() ==
         (
-          window.DATASETTE_CLUSTER_MAP_LONGITUDE_COLUMN || "longitude"
+          window.DATASETTE_CLUSTER_MAP_LONGITUDE_COLUMN
         ).toLowerCase()
       ) {
         longitudeColumn = col;
@@ -185,8 +185,19 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   style.innerText = clusterMapCSS;
   document.head.appendChild(style);
 
-  function isValid(latOrLon) {
-    return !isNaN(parseFloat(latOrLon));
+  function isValidLatitude(latitude) {
+    latitude = parseFloat(latitude);
+    if (isNaN(latitude)) {
+      return false;
+    }
+    return latitude >= -90 && latitude <= 90;
+  }
+  function isValidLongitude(longitude) {
+    longitude = parseFloat(longitude);
+    if (isNaN(longitude)) {
+      return false;
+    }
+    return longitude >= -180 && longitude <= 180;
   }
 
   const loadMarkers = (path, map, markerClusterGroup, progressDiv, count) => {
@@ -196,7 +207,7 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
       .then((data) => {
         let markerList = [];
         data.rows.forEach((row) => {
-          if (isValid(row[latitudeColumn]) && isValid(row[longitudeColumn])) {
+          if (isValidLatitude(row[latitudeColumn]) && isValidLongitude(row[longitudeColumn])) {
             let markerContent = clusterMapMarkerContent(row);
             let marker = L.marker(
               L.latLng(row[latitudeColumn], row[longitudeColumn])
@@ -215,9 +226,10 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
         if (next_url && location.protocol == "https:") {
           next_url = next_url.replace(/^https?:/, "https:");
         }
+        let total = data.count || data.filtered_table_rows_count;
         if (next_url) {
           percent = ` (${
-            Math.round((count / data.filtered_table_rows_count) * 100 * 100) /
+            Math.round((count / total) * 100 * 100) /
             100
           }%)`;
           // Add a control to either continue loading or pause
@@ -296,10 +308,11 @@ const addClusterMap = (latitudeColumn, longitudeColumn) => {
   });
   map.addLayer(markerClusterGroup);
   let path = location.pathname + ".json" + location.search;
+  const qs = "_size=max&_labels=on&_extra=count&_extra=next_url&_shape=objects";
   if (path.indexOf("?") > -1) {
-    path += "&_size=max&_labels=on&_shape=objects";
+    path += "&" + qs;
   } else {
-    path += "?_size=max&_labels=on&_shape=objects";
+    path += "?" + qs;
   }
   loadMarkers(path, map, markerClusterGroup, progressDiv, 0);
   //loading.remove();
